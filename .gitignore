@@ -57,3 +57,9 @@ typings/
 # dotenv environment variables file
 .env
 
+.idea/markdown-navigator.xml
+.idea/modules.xml
+.idea/react-native-css-tree.iml
+.idea/vcs.xml
+.idea/workspace.xml
+.idea/markdown-navigator/profiles_settings.xml
