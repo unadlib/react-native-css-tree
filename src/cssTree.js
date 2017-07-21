@@ -5,8 +5,9 @@
  * Project [ react-native-css-tree ] Coded on WebStorm.
  */
 
-const inheritRegular = /^\_/;
-const variableRegular = /\$\./;
+const prefix = "$";
+const inheritRegular = new RegExp("^\_");
+const variableRegular = new RegExp(`${prefix}\.`);
 
 export function createCSS(init = {}) {
     return function (...processes) {
@@ -32,7 +33,7 @@ function parseStyle(style = {}, init = {}, processes = [], parent = {}) {
             parseStyle(newStyle, init, processes, style);
         } else {
             if (variableRegular.test(style[i])) {
-                style[i] = new Function("$", `return ${style[i]}`)({
+                style[i] = new Function(prefix, `return ${style[i]}`)({
                     ...init,
                     ...css(parent)
                 });
