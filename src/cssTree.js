@@ -7,7 +7,7 @@
 
 const prefix = "$";
 const inheritRegular = new RegExp("^\_");
-const variableRegular = new RegExp(`${prefix}\.`);
+const variableRegular = new RegExp(`\\${prefix}\.`);
 
 export function createCSS(init = {}) {
     return function (...processes) {
