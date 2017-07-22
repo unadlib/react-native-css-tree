@@ -21,7 +21,7 @@ function isPlainObject(arg) {
     return toString.call(arg) === "[object Object]";
 }
 
-function parseStyle(style = {}, init = {}, processes = [], parent = {}) {
+function parseStyle(style = {}, init = {}, processes = [], variables = {}) {
     Object.keys(style).map(i => {
         let isSubNode = isPlainObject(style[i]);
         let clone = JSON.parse(JSON.stringify(style[i]));
@@ -30,13 +30,10 @@ function parseStyle(style = {}, init = {}, processes = [], parent = {}) {
             processes.map(fn => {
                 newStyle = fn(i, style, newStyle);
             });
-            parseStyle(newStyle, init, processes, style);
+            parseStyle(newStyle, init, processes, {...variables, ...css(style)});
         } else {
             if (variableRegular.test(style[i])) {
-                style[i] = new Function(prefix, `return ${style[i]}`)({
-                    ...init,
-                    ...css(parent)
-                });
+                style[i] = new Function(prefix, `return ${style[i]}`)(variables);
             }
         }
     });
