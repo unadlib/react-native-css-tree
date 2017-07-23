@@ -11,19 +11,19 @@ import {
     Text,
     View
 } from 'react-native';
-import {css, createCSS} from 'react-native-css-tree';
+import cssTree from 'react-native-css-tree';
 
 export default class example extends Component {
     render() {
         return (
-            <View style={css(styles.container)}>
-                <Text style={css(styles.container.welcome)}>
+            <View style={styles.container}>
+                <Text style={styles.container.welcome}>
                     Welcome to React Native!
                 </Text>
-                <Text style={css(styles.container.instructions)}>
+                <Text style={styles.container.instructions}>
                     To get started, edit index.ios.js
                 </Text>
-                <Text style={css(styles.container.instructions)}>
+                <Text style={styles.container.instructions}>
                     Press Cmd+R to reload,{'\n'}
                     Cmd+D or shake for dev menu
                 </Text>
@@ -50,13 +50,15 @@ const style = {
     },
 };
 
-const styles = createCSS({
+const styles = cssTree({
     mainColor: '#00d1ff',
+    otherColor: '#fff',
     textColor: "#333333",
     fontSize: 20,
+    backgroundColor: "red",
     grid: 10,
 })(function (key, parent, sub) {
-    sub.marginBottom = 5;
+    if(key==="welcome") sub.color = parent.otherColor;
     return sub
 })(style);
 

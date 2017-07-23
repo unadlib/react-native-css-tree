@@ -9,7 +9,7 @@ const prefix = "$";
 const inheritRegular = new RegExp("^\_");
 const variableRegular = new RegExp(`\\${prefix}\.`);
 
-export function createCSS(init = {}) {
+export default function createCSS(init = {}) {
     return function (...processes) {
         return function (styles) {
             return getTree(styles, init, processes);
@@ -27,10 +27,11 @@ function parseStyle(style = {}, init = {}, processes = [], variables = {}) {
         let clone = JSON.parse(JSON.stringify(style[i]));
         if (isSubNode) {
             let newStyle = inheritRegular.test(i) ? Object.assign(style[i], css(style), clone) : style[i];
+            let parentStyle = {...variables, ...css(style)};
             processes.map(fn => {
-                newStyle = fn(i, style, newStyle);
+                newStyle = fn(i, parentStyle, newStyle);
             });
-            parseStyle(newStyle, init, processes, {...variables, ...css(style)});
+            parseStyle(newStyle, init, processes, parentStyle);
         } else {
             if (variableRegular.test(style[i])) {
                 style[i] = new Function(prefix, `return ${style[i]}`)(variables);
@@ -46,13 +47,39 @@ function getTree(styles = {}, init = {}, processes = []) {
         parseStyle(root, init, processes, init);
         $styles[i] = root;
     });
-    return $styles;
+    return getCssTree(parserJSON($styles));
 }
 
-export function css(style = {}) {
+function css(style = {}) {
     let $style = {};
     Object.keys(style).map(name => {
         if (!isPlainObject(style[name])) $style[name] = style[name];
     });
     return $style;
-};
+}
+
+function getCssTree(style = {}) {
+    function CssTree() {
+        Object.keys(style.root).map(i => {
+            this[i] = style.root[i]
+        });
+    }
+
+    Object.keys(style.proto).map(i => {
+        if (isPlainObject(style.proto[i])) {
+            CssTree.prototype[i] = getCssTree(parserJSON(style.proto[i]));
+        } else {
+            CssTree.prototype[i] = style.proto[i];
+        }
+    });
+    return new CssTree();
+}
+
+function parserJSON(style = {}) {
+    let $style = {proto: {}, root: {}};
+    Object.keys(style).map(name => {
+        let key = isPlainObject(style[name]) ? "proto" : "root";
+        $style[key][name] = style[name];
+    });
+    return $style;
+}

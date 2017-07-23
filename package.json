@@ -1,6 +1,6 @@
 {
   "name": "react-native-css-tree",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "description": "Inheritable dynamic style tree.",
   "main": "src/cssTree.js",
   "scripts": {

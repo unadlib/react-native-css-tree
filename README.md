@@ -15,9 +15,9 @@ npm install --save react-native-css-tree
 ```
 ### Usage
 ```javascript
-import {css, createCSS} from 'react-native-css-tree';
+import cssTree from 'react-native-css-tree';
 
-const styles = createCSS({ //globalStyle
+const styles = cssTree({ //globalStyle
     grid:10,
 })((key, parent, sub)=>{ //middleware
     return sub;
@@ -32,20 +32,19 @@ const styles = createCSS({ //globalStyle
     },
 });
 
-<View style={css(styles.container)}>
-    <View style={css(styles.container._box)}></View>
+<View style={styles.container}>
+    <View style={styles.container._box}></View>
 </View>
 ```
 ### Configuration
 
-    Styles = createCSS(GlobalStyle)(Middleware)(Style);
+    Styles = cssTree(GlobalStyle)(Middleware)(Style);
 
 * GlobalStyle is used to configure global theme styles.
 * Middleware supports multiple middleware functions.
 * Style is original style tree:
     * `$.` reference variable, and support the operation.
     *  If use `_` As a key prefix , it inherits all of the style properties of the parent.
-* If it uses a style then the style must use `css(selector)` for formatting.
 
 
 
