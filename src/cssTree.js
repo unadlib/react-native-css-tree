@@ -60,9 +60,7 @@ function css(style = {}) {
 
 function getCssTree(style = {}) {
     function CssTree() {
-        Object.keys(style.root).map(i => {
-            this[i] = style.root[i]
-        });
+        Object.assign(this, style.root);
     }
 
     Object.keys(style.proto).map(i => {
