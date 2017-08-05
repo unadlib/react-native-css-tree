@@ -8,7 +8,8 @@ This is a react-native style module plug-in that features a modular JSON object 
    * Style tree namespaces.
    * Global variables.
    * Priority inheritance.
-   
+   * Functional CSS.
+
 ### Installation
 ```shell
 npm install --save react-native-css-tree
@@ -19,16 +20,23 @@ import cssTree from 'react-native-css-tree';
 
 const styles = cssTree({ //globalStyle
     grid:10,
+    base:{
+        size: 10,
+    }
 })((key, parent, sub)=>{ //middleware
     return sub;
 })({
     container:{
         flex: 1,
-        margin: "$.grid",
+        margin: "$grid",
         padding: 5,
         _box:{
             height: 100,
-        }
+        },
+        text:(color)=>({
+            color,
+            fontSize: "$base.size"
+        })
     },
 });
 
@@ -43,7 +51,7 @@ const styles = cssTree({ //globalStyle
 * GlobalStyle is used to configure global theme styles.
 * Middleware supports multiple middleware functions.
 * Style is original style tree:
-    * `$.` reference variable, and support the operation.
+    * `$` reference variable, and support the operation.
     *  If use `_` As a key prefix , it inherits all of the style properties of the parent.
 
 

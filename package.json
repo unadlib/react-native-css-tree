@@ -1,10 +1,16 @@
 {
   "name": "react-native-css-tree",
-  "version": "0.0.8",
+  "version": "1.0.0",
   "description": "Inheritable dynamic style tree.",
   "main": "src/cssTree.js",
   "files": [
     "src"
+  ],
+  "keywords": [
+    "React-Native",
+    "CSS",
+    "Style",
+    "react-native-css-tree"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
