@@ -1,4 +1,8 @@
 # react-native-css-tree
+[![Travis](https://img.shields.io/travis/unadlib/react-native-css-tree.svg)](https://travis-ci.org/unadlib/react-native-css-tree)
+[![npm](https://img.shields.io/npm/l/react-native-css-tree.svg)](https://www.npmjs.com/package/react-native-css-tree)
+[![npm](https://img.shields.io/npm/v/react-native-css-tree.svg)](https://www.npmjs.com/package/react-native-css-tree)
+[![npm](https://img.shields.io/npm/dt/react-native-css-tree.svg)](https://www.npmjs.com/package/react-native-css-tree)
 
 This is a react-native style module plug-in that features a modular JSON object tree structure.
 
