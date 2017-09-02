@@ -80,11 +80,11 @@ function getTree(styles = {}, init = {}, processes = []) {
 
 function css(style = {}) {
     let $style = {};
-    Object.keys(style).map(name => {
+    for(let name in style){
         if (isPure(style[name])) {
             $style[name] = style[name]
         }
-    });
+    }
     return $style;
 }
 
