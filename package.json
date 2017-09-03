@@ -13,8 +13,8 @@
     "react-native-css-tree"
   ],
   "scripts": {
-    "lint": "xo",
     "test": "jest",
+    "prettier": "prettier --single-quote --no-semi --no-bracket-spacing false --trailing-comma es5 --write 'src/**/*.js'",
     "test:cover": "jest --coverage",
     "test:cover:travis": "npm run test:cover && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls"
   },
@@ -30,21 +30,76 @@
   "homepage": "https://github.com/unadlib/react-native-css-tree#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-eslint": "^7.2.3",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "coveralls": "^2.13.1",
-    "eslint-config-unadlib": "^1.0.0",
+    "eslint": "^4.6.0",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-config-prettier": "^2.4.0",
+    "eslint-config-unadlib": "^1.0.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^6.0.2",
+    "eslint-plugin-prettier": "^2.2.0",
+    "eslint-plugin-react": "^7.3.0",
     "jest": "^20.0.4",
-    "xo": "^0.18.2"
+    "prettier": "^1.6.1"
   },
-  "xo": {
-    "extends": "unadlib",
-    "esnext": true,
-    "envs": [
-      "jest"
+  "eslintConfig": {
+    "parser": "babel-eslint",
+    "extends": [
+      "airbnb/base",
+      "prettier",
+      "unadlib"
     ],
     "rules": {
-      "no-useless-escape": 0
+      "indent": [
+        2,
+        2,
+        {
+          "SwitchCase": 1
+        }
+      ],
+      "complexity": [
+        2,
+        10
+      ],
+      "max-depth": [
+        2,
+        4
+      ],
+      "max-nested-callbacks": [
+        2,
+        3
+      ],
+      "max-params": [
+        2,
+        5
+      ],
+      "max-statements": [
+        2,
+        50
+      ],
+      "semi": [
+        2,
+        "never"
+      ],
+      "no-new-func": "off"
+    },
+    "parserOptions": {
+      "ecmaVersion": 6,
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "jsx": true
+      }
+    },
+    "env": {
+      "browser": true,
+      "node": true
     }
-  }
+  },
+  "eslintIgnore": [
+    "example/",
+    "__tests__/"
+  ]
 }

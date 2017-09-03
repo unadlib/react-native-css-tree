@@ -5,109 +5,165 @@
  * Project [ react-native-css-tree ] Coded on WebStorm.
  */
 
-const prefix = "$";
-const inheritRegular = new RegExp("^\_");
-const variableRegular = new RegExp(`\\${prefix}`, "g");
+const prefix = '$'
+const inheritRegular = new RegExp('^_')
+const variableRegular = new RegExp(`\\${prefix}`, 'g')
 
-export default function createCSS(init = {}) {
-    return function (...processes) {
-        return function (styles) {
-            return getTree(styles, init, processes);
-        };
-    }
+const isPlainObject = (arg) => toString.call(arg) === '[object Object]'
+const isFunction = (arg) => toString.call(arg) === '[object Function]'
+const isPure = (arg) => !(isPlainObject(arg) || isFunction(arg))
+
+/**
+ * replace String.
+ * @param str
+ * @param quote
+ */
+const replace = (str, quote) => {
+  const regs = new RegExp(`(${quote}\\s*\\$[^${quote}]+\\s*${quote})`, 'g')
+  const reg = new RegExp(quote, 'g')
+  return str.replace(regs, i => i.replace(reg, ''))
 }
 
-function isPlainObject(arg) {
-    return toString.call(arg) === "[object Object]";
+/**
+ * Transform string template.
+ * @param args
+ * @param variable
+ * @returns {*}
+ */
+const transform = (args, variable) => {
+  const fn = new Function(
+    ...Object.keys(args).map(i => prefix + i),
+    `return ${variable}`,
+  )
+  return fn(...Object.keys(args).map(i => args[i]))
 }
 
-function isFunction(arg) {
-    return toString.call(arg) === "[object Function]";
-}
-
-function isPure(arg) {
-    return !(isPlainObject(arg) || isFunction(arg));
-}
-
-function parseStyle(style = {}, init = {}, processes = [], variables = {}) {
-    Object.keys(style).map(i => {
-        let clone = JSON.parse(JSON.stringify(css(style[i])));
-        if (isPlainObject(style[i])) {
-            let newStyle = inheritRegular.test(i) ? Object.assign(style[i], css(style), clone) : style[i];
-            let parentStyle = {...variables, ...css(style)};
-            processes.map(fn => {
-                newStyle = fn(i, parentStyle, newStyle);
-            });
-            parseStyle(newStyle, init, processes, parentStyle);
-        } else if (isFunction(style[i])) {
-            let fn = replace(style[i].toString(), "'");
-            fn = replace(fn, '"');
-            let args = Object.assign({}, variables, css(style));
-            style[i] = transform(args, fn);
-        } else {
-            if (variableRegular.test(style[i])) {
-                let fnString = `return ${style[i].replace(variableRegular, prefix + '.')}`;
-                style[i] = new Function(prefix, fnString)(variables);
-            }
-        }
-    });
-}
-
-function replace(str, quote) {
-    let regs = new RegExp(`(${quote}\\s*\\$[^${quote}]+\\s*${quote})`, "g");
-    let reg = new RegExp(quote, "g");
-    return str.replace(regs, (i) => i.replace(reg, ''));
-}
-
-function transform(args, variable) {
-    let fn = new Function(...Object.keys(args).map(i => prefix + i), `return ${variable}`);
-    return fn(...Object.keys(args).map(i => args[i]));
-}
-
-
-function getTree(styles = {}, init = {}, processes = []) {
-    let $styles = {};
-    Object.keys(styles).map(i => {
-        let root = styles[i];
-        processes.map(fn => {
-            root = fn(i, init, root);
-        });
-        parseStyle(root, init, processes, init);
-        $styles[i] = root;
-    });
-    return getCssTree(parserJSON($styles));
-}
-
+/**
+ * Filtering objects above the JSON two layer
+ * @param style
+ * @returns {{}}
+ */
 function css(style = {}) {
-    let $style = {};
-    for(let name in style){
-        if (isPure(style[name])) {
-            $style[name] = style[name]
-        }
+  const $style = {}
+  Object.keys(style).map(name => {
+    if (isPure(style[name])) {
+      $style[name] = style[name]
     }
-    return $style;
+    return name
+  })
+  return $style
 }
 
-function getCssTree(style = {}) {
-    function CssTree() {
-        Object.assign(this, style.root);
+/**
+ * separate Style.
+ * @param style
+ * @param name
+ * @param value
+ * @returns {[null,null]}
+ */
+const separate = (style, [name, value]) => {
+  const $style = style
+  const key = !isPure(value) ? 'proto' : 'root'
+  $style[key][name] = value
+}
+
+/**
+ * Separate the CSS JSON.
+ * @param style
+ * @returns {{proto: {}, root: {}}}
+ */
+const separateJSON = (style = {}) => {
+  const $style = {
+    proto: {},
+    root: {},
+  }
+  Object.entries(style).map(separate.bind(this, $style))
+  return $style
+}
+
+/**
+ * Create the CSS tree prototype.
+ * @param root
+ * @param proto
+ * @returns {CssTree}
+ */
+const getCssTree = ({root = {}, proto = {}} = {}) => {
+  function CssTree() {
+    Object.assign(this, root)
+  }
+
+  function getPrototype(cssTree, i) {
+    const {prototype} = cssTree
+    if (isPlainObject(proto[i])) {
+      prototype[i] = getCssTree(separateJSON(proto[i]))
+    } else {
+      prototype[i] = proto[i]
     }
+  }
 
-    Object.keys(style.proto).map(i => {
-        if (isPlainObject(style.proto[i])) {
-            CssTree.prototype[i] = getCssTree(parserJSON(style.proto[i]));
-        } else {
-            CssTree.prototype[i] = style.proto[i];
-        }
-    });
-    return new CssTree();
+  Object.keys(proto).map(getPrototype.bind(this, CssTree))
+  return new CssTree()
 }
 
-function parserJSON(style = {}) {
-    let $style = {proto: {}, root: {}};
-    Object.keys(style).map(name => {
-        let key = !isPure(style[name]) ? "proto" : "root";
-        $style[key][name] = style[name];
-    });
-    return $style;
+/**
+ * parse Style.
+ * @param originalStyle
+ * @param init
+ * @param processes
+ * @param variables
+ */
+const parseStyle = (originalStyle = {}, init = {}, processes = [], variables = {}) => {
+  const style = originalStyle
+  Object.keys(style).map(i => {
+    const clone = JSON.parse(JSON.stringify(css(style[i])))
+    if (isPlainObject(style[i])) {
+      let newStyle = inheritRegular.test(i)
+        ? Object.assign(style[i], css(style), clone)
+        : style[i]
+      const parentStyle = {...variables, ...css(style)}
+      processes.map(fn => {
+        newStyle = fn(i, parentStyle, newStyle)
+        return fn
+      })
+      parseStyle(newStyle, init, processes, parentStyle)
+    } else if (isFunction(style[i])) {
+      let fn = replace(style[i].toString(), '\'')
+      fn = replace(fn, '"')
+      const args = Object.assign({}, variables, css(style))
+      style[i] = transform(args, fn)
+    } else if (variableRegular.test(style[i])) {
+      const fnString = `return ${style[i].replace(
+        variableRegular,
+        `${prefix}.`,
+      )}`
+      style[i] = new Function(prefix, fnString)(variables)
+    }
+    return i
+  })
 }
+
+
+/**
+ * getTree
+ * @param styles
+ * @param init
+ * @param processes
+ * @returns {CssTree}
+ */
+const getTree = (styles = {}, init = {}, processes = []) => {
+  const $styles = {}
+  const func = i => {
+    let root = styles[i]
+    const setRoot = fn => {
+      root = fn(i, init, root)
+    }
+    processes.map(setRoot)
+    parseStyle(root, init, processes, init)
+    $styles[i] = root
+  }
+  Object.keys(styles).map(func)
+  return getCssTree(separateJSON($styles))
+}
+
+export default (init = {}) => (...processes) => styles =>
+  getTree(styles, init, processes)

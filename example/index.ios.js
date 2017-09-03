@@ -14,7 +14,7 @@ import cssTree from 'react-native-css-tree';
 
 export default class example extends Component {
     render() {
-        console.log(styles.container.instructions.text("blue"));
+        console.log(styles.container.instructions.text("blue"),styles.container.welcome.color);
         return (
             <View style={styles.container}>
                 <Text style={styles.container.welcome}>
