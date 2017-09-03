@@ -43,7 +43,7 @@ const transform = (args, variable) => {
  * @param style
  * @returns {{}}
  */
-function css(style = {}) {
+const css = (style = {}) => {
   const $style = {}
   Object.keys(style).map(name => {
     if (isPure(style[name])) {
@@ -116,7 +116,8 @@ const parseStyle = (
   originalStyle = {},
   init = {},
   processes = [],
-  variables = {},) => {
+  variables = {},
+) => {
   const style = originalStyle
   Object.keys(style).map(i => {
     const clone = JSON.parse(JSON.stringify(css(style[i])))
@@ -131,7 +132,7 @@ const parseStyle = (
       })
       parseStyle(newStyle, init, processes, parentStyle)
     } else if (isFunction(style[i])) {
-      let fn = replace(style[i].toString(), '\'')
+      let fn = replace(style[i].toString(), "'")
       fn = replace(fn, '"')
       const args = Object.assign({}, variables, css(style))
       style[i] = transform(args, fn)
