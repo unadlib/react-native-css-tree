@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "test": "jest",
-    "prettier": "prettier --single-quote --no-semi --no-bracket-spacing false --trailing-comma es5 --write 'src/**/*.js'",
+    "prettier": "prettier --single-quote --no-semi --no-bracket-spacing false --trailing-comma all --write 'src/**/*.js'",
     "test:cover": "jest --coverage",
     "test:cover:travis": "npm run test:cover && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls"
   },

@@ -33,7 +33,7 @@ const replace = (str, quote) => {
 const transform = (args, variable) => {
   const fn = new Function(
     ...Object.keys(args).map(i => prefix + i),
-    `return ${variable}`
+    `return ${variable}`,
   )
   return fn(...Object.keys(args).map(i => args[i]))
 }
@@ -116,8 +116,7 @@ const parseStyle = (
   originalStyle = {},
   init = {},
   processes = [],
-  variables = {}
-) => {
+  variables = {},) => {
   const style = originalStyle
   Object.keys(style).map(i => {
     const clone = JSON.parse(JSON.stringify(css(style[i])))
@@ -132,14 +131,14 @@ const parseStyle = (
       })
       parseStyle(newStyle, init, processes, parentStyle)
     } else if (isFunction(style[i])) {
-      let fn = replace(style[i].toString(), "'")
+      let fn = replace(style[i].toString(), '\'')
       fn = replace(fn, '"')
       const args = Object.assign({}, variables, css(style))
       style[i] = transform(args, fn)
     } else if (variableRegular.test(style[i])) {
       const fnString = `return ${style[i].replace(
         variableRegular,
-        `${prefix}.`
+        `${prefix}.`,
       )}`
       style[i] = new Function(prefix, fnString)(variables)
     }
@@ -168,8 +167,6 @@ const getTree = (styles = {}, init = {}, processes = []) => {
   Object.keys(styles).map(func)
   return getCssTree(separateJSON($styles))
 }
-
-console.log([{},1,2],1)
 
 export default (init = {}) => (...processes) => styles =>
   getTree(styles, init, processes)
