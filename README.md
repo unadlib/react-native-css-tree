@@ -59,6 +59,7 @@ const styles = cssTree({ //globalStyle
     * `$` reference variable, and support the operation.
     *  If use `_` As a key prefix , it inherits all of the style properties of the parent.
 
-
+### TODO
+- [ ] support combine `padding/margin/border/box-shadow/background`  
 
 
